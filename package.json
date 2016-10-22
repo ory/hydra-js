@@ -1,0 +1,35 @@
+{
+  "name": "hydra-js",
+  "version": "0.0.1",
+  "description": "A client library for Hydra, an OAuth2 and OpenID Connect Provider",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint \"+*.js\" --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ory-am/hydra-js.git"
+  },
+  "author": "Aeneas Rekkas @arekkas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ory-am/hydra-js/issues"
+  },
+  "homepage": "https://github.com/ory-am/hydra-js#readme",
+  "devDependencies": {
+    "eslint": "^3.8.1",
+    "eslint-config-ory-am": "^3.0.0",
+    "jest": "^16.0.2",
+    "jwt-decode": "^2.1.0",
+    "nock": "^8.1.0"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^7.1.9",
+    "jwk-to-pem": "^1.2.5",
+    "simple-oauth2": "^1.0.0",
+    "superagent": "^2.3.0",
+    "superagent-auth-bearer": "0.0.1"
+  }
+}

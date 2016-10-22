@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "eslint-config-ory-am"
+  ],
+  "env": {
+    "node": true,
+    "browser": true
+  },
+  "rules": {
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+  },
+  "matrix": {
+    "no-console": ["error", { "allow": ["warn", "error"] }]
+  }
+}
