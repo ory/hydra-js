@@ -29,6 +29,24 @@ $ npm i --save hydra-js
 
 ## Examples
 
+### Instantiating
+
+```js
+var Hydra = require('hydra-js')
+
+const config = {
+ client: {
+   id: process.env.HYDRA_CLIENT_ID, // id of the client you want to use, defaults to this env var
+   secret: process.env.HYDRA_CLIENT_SECRET, // secret of the client you want to use, defaults to this env var
+ },
+ auth: {
+   tokenHost: process.env.HYDRA_URL, // hydra url, defaults to this env var
+ }
+}
+
+const hydra = new Hydra(config)
+```
+
 ### Getting an access token with the client_credentials flow
 
 ```js
