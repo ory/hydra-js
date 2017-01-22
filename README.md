@@ -5,8 +5,10 @@
 [![Join newsletter](https://img.shields.io/badge/join-newsletter-00cc99.svg)](http://eepurl.com/bKT3N9)
 
 [Hydra](https://github.com/ory-am/hydra) is a runnable server implementation of the OAuth2 2.0 authorization framework and the OpenID Connect Core 1.0.
+
 Hydra-js is a client library for javascript. It is currently available as an npm-module only. At this moment, Hydra-js
-provides functionality only suitable for Identity Providers. We welcome contributions that implement more of the Hydra HTTP REST API.
+primarily helps you with performing the consent validation.
+We welcome contributions that implement more of the Hydra HTTP REST API.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
