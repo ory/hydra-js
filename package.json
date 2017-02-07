@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ory-am/hydra-js.git"
+    "url": "git+https://github.com/ory/hydra-js.git"
   },
   "author": "Aeneas Rekkas @arekkas",
   "license": "Apache 2.0",
   "bugs": {
-    "url": "https://github.com/ory-am/hydra-js/issues"
+    "url": "https://github.com/ory/hydra-js/issues"
   },
-  "homepage": "https://github.com/ory-am/hydra-js#readme",
+  "homepage": "https://github.com/ory/hydra-js#readme",
   "devDependencies": {
     "eslint": "^3.8.1",
     "eslint-config-ory-am": "^3.0.0",

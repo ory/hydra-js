@@ -1,10 +1,10 @@
 # hydra-js
 
-[![Join the chat at https://gitter.im/ory-am/hydra](https://img.shields.io/badge/join-chat-00cc99.svg)](https://gitter.im/ory-am/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/ory/hydra](https://img.shields.io/badge/join-chat-00cc99.svg)](https://gitter.im/ory/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join mailinglist](https://img.shields.io/badge/join-mailinglist-00cc99.svg)](https://groups.google.com/forum/#!forum/ory-hydra/new)
 [![Join newsletter](https://img.shields.io/badge/join-newsletter-00cc99.svg)](http://eepurl.com/bKT3N9)
 
-[Hydra](https://github.com/ory-am/hydra) is a runnable server implementation of the OAuth2 2.0 authorization framework and the OpenID Connect Core 1.0.
+[Hydra](https://github.com/ory/hydra) is a runnable server implementation of the OAuth2 2.0 authorization framework and the OpenID Connect Core 1.0.
 
 Hydra-js is a client library for javascript. It is currently available as an npm-module only. At this moment, Hydra-js
 primarily helps you with performing the consent validation.
