@@ -2,7 +2,7 @@
   "name": "hydra-js",
   "version": "0.0.0",
   "description": "A client library for Hydra, an OAuth2 and OpenID Connect Provider",
-  "main": "index.js",
+  "main": "hydra.js",
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
