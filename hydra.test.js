@@ -1,6 +1,8 @@
 var Hydra = require('./hydra.js')
 var nock = require('nock')
 var jwtDecode = require('jwt-decode')
+var jwt = require('jsonwebtoken')
+var jwkToPem = require('jwk-to-pem')
 
 describe('services', () => {
   describe('Hydra', () => {
@@ -50,7 +52,7 @@ describe('services', () => {
       })
     })
 
-    test('consent challenge verification and consent response signing should work when a valid key is provided', () => {
+    test('consent challenge verification and consent response signing should work when a valid key is provided', () => new Promise((resolve, reject) => {
       const keys = {
         "keys": [
           {
@@ -71,19 +73,43 @@ describe('services', () => {
         ]
       }
 
+      const pem = jwkToPem(Object.assign({}, keys.keys[0], {
+        dp: '',
+        dq: '',
+        qi: ''
+      }), { private: true })
+
       nock('http://foo.localhost').get('/keys/hydra.consent.response/private').reply(200, { keys: [keys.keys[0]] })
       nock('http://foo.localhost').get('/keys/hydra.consent.challenge/public').reply(200, { keys: [keys.keys[1]] })
 
       const h = new Hydra(config)
-      const challenge = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZTNhOGI2YS1kMDExLTQ4MzctOTM0Ni02ZTVlMzhmYzY1OGEiLCJleHAiOjE0NzQ5ODYwMzIsImp0aSI6IjNjODdlNjgxLTdjNzctNDQwZS1iNGI0LTE1YTFmOTYzZDA3MyIsInJlZGlyIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6ODAwMC9vYXV0aDIvYXV0aD9jbGllbnRfaWQ9YWUzYThiNmEtZDAxMS00ODM3LTkzNDYtNmU1ZTM4ZmM2NThhXHUwMDI2cmVkaXJlY3RfdXJpPWh0dHAlM0ElMkYlMkZsb2NhbGhvc3QlM0E0NDQ1JTJGY2FsbGJhY2tcdTAwMjZyZXNwb25zZV90eXBlPWNvZGVcdTAwMjZzY29wZT1oeWRyYStvZmZsaW5lK29wZW5pZFx1MDAyNnN0YXRlPXl4Z2RydnJvb2VnY3d1c3duaWd0cnducFx1MDAyNm5vbmNlPWl5ZndnbmtrbmRjbXBheGRtZWNpdWZtdiIsInNjcCI6WyJoeWRyYSIsIm9mZmxpbmUiLCJvcGVuaWQiXX0.WCMR50S_NSFxGDBAaMdaatF9025hzb8r0_OmMJgenou7uA5br5_B_KkonrwIljaVjAF4D4kmXpIAKKRy_Ip-smmdVPkgnZAUZMjzDbYNUnes3WdaD3vR9VTRXrB0rOdQZc1vQb-F5t2AA3obVpI3tGABdt0dr8OAg_H6d_dmprcBvOqv3yZTwrhlCRdk5apmvSSvcsdDvEhQixRYsEjeN6KmpqWVaBWet1QFCxG7DllKrmt4TzTJYoWWxd_w3Y7H1i3ZASJUx5M-s9KzvYnw6ShlOWIlwrfr5Zg5C8pCopHzhaeEKB26yqPyUC2FxuD0ncjhxa13qG8BqvMpQX43o4jIc3Ins6OmuQkpRqCqhqaHcgkZLSRkC6PWlLYz3ogeKy_WcmY4Y0fARnvbd5iRG6b_WfcAOz0aDl63BW99vVKi90fpYfOtg_jz5xRIg6BI8tR6WJcoDTh4KMQXGbD_gCV8ODrPTcydMgHFQUviKr0AUyg-EXq_J9Qm8_jn_SbCh6Dv1RPCUVQ3uD2ZELFPN12Ww3zYgX3Y5c46WygWxt5AEs2fc37rF6xnPpdqrRq89kvPVZoCJKXfY9XzFaK-kHyYUtbuLw8PVRVx018dle3lrmnDKlRi6IKY3dgdgoEKxKUazjJftO3NA6Y0Xi_510ArRcCrLf_e9CTBlyrZeHI'
+      // const challenge = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZTNhOGI2YS1kMDExLTQ4MzctOTM0Ni02ZTVlMzhmYzY1OGEiLCJleHAiOjE0NzQ5ODYwMzIsImp0aSI6IjNjODdlNjgxLTdjNzctNDQwZS1iNGI0LTE1YTFmOTYzZDA3MyIsInJlZGlyIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6ODAwMC9vYXV0aDIvYXV0aD9jbGllbnRfaWQ9YWUzYThiNmEtZDAxMS00ODM3LTkzNDYtNmU1ZTM4ZmM2NThhXHUwMDI2cmVkaXJlY3RfdXJpPWh0dHAlM0ElMkYlMkZsb2NhbGhvc3QlM0E0NDQ1JTJGY2FsbGJhY2tcdTAwMjZyZXNwb25zZV90eXBlPWNvZGVcdTAwMjZzY29wZT1oeWRyYStvZmZsaW5lK29wZW5pZFx1MDAyNnN0YXRlPXl4Z2RydnJvb2VnY3d1c3duaWd0cnducFx1MDAyNm5vbmNlPWl5ZndnbmtrbmRjbXBheGRtZWNpdWZtdiIsInNjcCI6WyJoeWRyYSIsIm9mZmxpbmUiLCJvcGVuaWQiXX0.WCMR50S_NSFxGDBAaMdaatF9025hzb8r0_OmMJgenou7uA5br5_B_KkonrwIljaVjAF4D4kmXpIAKKRy_Ip-smmdVPkgnZAUZMjzDbYNUnes3WdaD3vR9VTRXrB0rOdQZc1vQb-F5t2AA3obVpI3tGABdt0dr8OAg_H6d_dmprcBvOqv3yZTwrhlCRdk5apmvSSvcsdDvEhQixRYsEjeN6KmpqWVaBWet1QFCxG7DllKrmt4TzTJYoWWxd_w3Y7H1i3ZASJUx5M-s9KzvYnw6ShlOWIlwrfr5Zg5C8pCopHzhaeEKB26yqPyUC2FxuD0ncjhxa13qG8BqvMpQX43o4jIc3Ins6OmuQkpRqCqhqaHcgkZLSRkC6PWlLYz3ogeKy_WcmY4Y0fARnvbd5iRG6b_WfcAOz0aDl63BW99vVKi90fpYfOtg_jz5xRIg6BI8tR6WJcoDTh4KMQXGbD_gCV8ODrPTcydMgHFQUviKr0AUyg-EXq_J9Qm8_jn_SbCh6Dv1RPCUVQ3uD2ZELFPN12Ww3zYgX3Y5c46WygWxt5AEs2fc37rF6xnPpdqrRq89kvPVZoCJKXfY9XzFaK-kHyYUtbuLw8PVRVx018dle3lrmnDKlRi6IKY3dgdgoEKxKUazjJftO3NA6Y0Xi_510ArRcCrLf_e9CTBlyrZeHI'
 
-      // generateConsentResponse validates the challenge, so both methods are covered with this
-      return h.generateConsentResponse(challenge, 'foobar', ['foo'], { bar: 'foo' }, { baz: 'foo' }).then((got) => {
-        const resp = jwtDecode(got.consent)
-        expect(resp.sub).toEqual('foobar')
-        expect(resp.at_ext.bar).toEqual('foo')
-        expect(resp.id_ext.baz).toEqual('foo')
+
+      jwt.sign({
+        "aud": "ae3a8b6a-d011-4837-9346-6e5e38fc658a",
+        "exp": (Date.now() / 1000 | 0) + 360,
+        "jti": "3c87e681-7c77-440e-b4b4-15a1f963d073",
+        "redir": "https://localhost:8000/oauth2/auth?client_id=ae3a8b6a-d011-4837-9346-6e5e38fc658a&redirect_uri=http%3A%2F%2Flocalhost%3A4445%2Fcallback&response_type=code&scope=hydra+offline+openid&state=yxgdrvrooegcwuswnigtrwnp&nonce=iyfwgnkkndcmpaxdmeciufmv",
+        "scp": [
+          "hydra",
+          "offline",
+          "openid"
+        ]
+      }, pem, { algorithm: 'RS256' }, (error, challenge) => {
+        if (error) {
+          return reject(error)
+        }
+
+        h.generateConsentResponse(challenge, 'foobar', ['foo'], { bar: 'foo' }, { baz: 'foo' }).then((got) => {
+          const resp = jwtDecode(got.consent)
+          expect(resp.sub).toEqual('foobar')
+          expect(resp.at_ext.bar).toEqual('foo')
+          expect(resp.id_ext.baz).toEqual('foo')
+          expect(resp.jti).toEqual('3c87e681-7c77-440e-b4b4-15a1f963d073')
+          resolve()
+        }).catch(reject)
       })
-    })
+    }))
   })
 })

@@ -1,8 +1,8 @@
 /* global process */
-var jwt = require('jsonwebtoken')
-var OAuth2 = require('simple-oauth2')
-var request = require('superagent')
-var jwkToPem = require('jwk-to-pem')
+const jwt = require('jsonwebtoken')
+const OAuth2 = require('simple-oauth2')
+const request = require('superagent')
+const jwkToPem = require('jwk-to-pem')
 
 require('superagent-auth-bearer')(request)
 
@@ -37,53 +37,57 @@ class Hydra {
         }
 
         this.token = this.oauth2.accessToken.create(result)
-        resolve(this.token)
+        return resolve(this.token)
       })
     })
   }
 
   getKey(set, kid) {
     return new Promise((resolve, reject) => {
-      this.authenticate().then(() => {
+      return this.authenticate().then(() => {
         request.get(`${this.endpoint}/keys/${set}/${kid}`).authBearer(this.token.token.access_token).end((err, res) => {
           if (err || !res.ok) {
-            return reject({ error: 'Could not retrieve validation key: ' + err.message })
+            reject({ error: 'Could not retrieve validation key: ' + err.message })
+            return
           }
-          return resolve(res.body.keys[0])
+          resolve(res.body.keys[0])
         })
-      }).catch(reject)
+      })
     })
   }
 
-  verifyConsentChallenge(challenge) {
+  verifyConsentChallenge(challenge = '') {
     return new Promise((resolve, reject) => {
-      this.getKey('hydra.consent.challenge', 'public').then((key) => {
+      return this.getKey('hydra.consent.challenge', 'public').then((key) => {
         jwt.verify(challenge, jwkToPem(key), (error, decoded) => {
           if (error) {
-            return reject({ error: 'Could not verify consent challenge: ' + error })
+            console.log('FUKKEN ERROR', error)
+            reject({ error: 'Could not verify consent challenge: ' + error })
+            return
           }
-          resolve({ challenge: decoded })
+           resolve({ challenge: decoded })
         })
-      }).catch(reject)
+      })
     })
   }
 
   generateConsentResponse(challenge, subject, scopes, at = {}, idt = {}) {
     return new Promise((resolve, reject) => {
-      this.verifyConsentChallenge().then(challenge, (challenge) => {
-        this.getKey('hydra.consent.response', 'private').then((key) => {
+      return this.verifyConsentChallenge(challenge).then(({challenge}) => {
+        return this.getKey('hydra.consent.response', 'private').then((key) => {
           const { aud, exp, jti } = challenge
           jwt.sign({ jti, aud, exp, scp: scopes, sub: subject, at_ext: at, id_ext: idt }, jwkToPem(Object.assign({}, key, {
             // the following keys are optional in the spec but for some reason required by the library.
             dp: '', dq: '', qi: ''
           }), { private: true }), { algorithm: 'RS256' }, (error, token) => {
             if (error) {
-              return reject({ error: 'Could not verify consent challenge: ' + error })
+              reject({ error: 'Could not verify consent challenge: ' + error })
+              return
             }
             resolve({ consent: token })
           })
-        }).catch(reject)
-      }).catch(reject)
+        })
+      })
     })
   }
 }
