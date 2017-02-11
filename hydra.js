@@ -72,8 +72,8 @@ class Hydra {
     return new Promise((resolve, reject) => {
       this.verifyConsentChallenge().then(challenge, (challenge) => {
         this.getKey('hydra.consent.response', 'private').then((key) => {
-          const { aud, exp } = challenge
-          jwt.sign({ aud, exp, scp: scopes, sub: subject, at_ext: at, id_ext: idt }, jwkToPem(Object.assign({}, key, {
+          const { aud, exp, jti } = challenge
+          jwt.sign({ jti, aud, exp, scp: scopes, sub: subject, at_ext: at, id_ext: idt }, jwkToPem(Object.assign({}, key, {
             // the following keys are optional in the spec but for some reason required by the library.
             dp: '', dq: '', qi: ''
           }), { private: true }), { algorithm: 'RS256' }, (error, token) => {
