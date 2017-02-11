@@ -1,5 +1,6 @@
 # hydra-js
 
+[![Build Status](https://travis-ci.org/ory/hydra-js.svg?branch=master)](https://travis-ci.org/ory/hydra-js)  
 [![Join the chat at https://gitter.im/ory/hydra](https://img.shields.io/badge/join-chat-00cc99.svg)](https://gitter.im/ory/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join mailinglist](https://img.shields.io/badge/join-mailinglist-00cc99.svg)](https://groups.google.com/forum/#!forum/ory-hydra/new)
 [![Join newsletter](https://img.shields.io/badge/join-newsletter-00cc99.svg)](http://eepurl.com/bKT3N9)
