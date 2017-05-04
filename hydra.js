@@ -32,7 +32,6 @@ class Hydra {
       this.oauth2 = OAuth2.create(this.config)
       this.oauth2.clientCredentials.getToken({ scope: 'hydra.keys.get' }, (error, result) => {
         if (error) {
-          console.error(error)
           return reject({ message: 'Could not retrieve access token: ' + error.message })
         }
 
@@ -61,7 +60,6 @@ class Hydra {
       return this.getKey('hydra.consent.challenge', 'public').then((key) => {
         jwt.verify(challenge, jwkToPem(key), (error, decoded) => {
           if (error) {
-            console.log('FUKKEN ERROR', error)
             reject({ error: 'Could not verify consent challenge: ' + error })
             return
           }
