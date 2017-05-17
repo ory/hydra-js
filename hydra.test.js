@@ -6,6 +6,22 @@ var jwkToPem = require('jwk-to-pem')
 
 describe('services', () => {
   describe('Hydra', () => {
+    process.env.HYDRA_CLIENT_ID = 'default_client'
+    process.env.HYDRA_CLIENT_SECRET = 'defulat_secret'
+    process.env.HYDRA_URL = 'http://default.localhost'
+    const defaults = {
+      client: {
+        id: process.env.HYDRA_CLIENT_ID,
+        secret: process.env.HYDRA_CLIENT_SECRET,
+      },
+      auth: {
+        tokenHost: process.env.HYDRA_URL,
+        authorizePath: '/oauth2/auth',
+        tokenPath: '/oauth2/token'
+      },
+      scope: 'hydra.keys.get'
+    }
+
     const config = {
       client: {
         id: 'client',
@@ -15,13 +31,45 @@ describe('services', () => {
         tokenHost: 'http://foo.localhost',
         authorizePath: '/oauth2/auth',
         tokenPath: '/oauth2/token'
-      }
+      },
+      scope: 'foo'
     }
 
     test('constructor should override default values', () => {
       const h = new Hydra(config)
-      expect(h.config).toEqual(config)
+      expect(h.config).toEqual({client: config.client, auth: config.auth})
       expect(h.endpoint).toEqual(config.auth.tokenHost)
+      expect(h.scope).toEqual(config.scope)
+    })
+
+    test('constructor should keep default values', () => {
+      const h = new Hydra()
+      expect(h.config).toEqual({client: defaults.client, auth: defaults.auth})
+      expect(h.endpoint).toEqual(defaults.auth.tokenHost)
+      expect(h.scope).toEqual(defaults.scope)
+    })
+
+    test('constructor should allow parital override of default values', () => {
+      const expectedUrl = 'http://bar.localhost'
+      const expectedId = 'foo'
+
+      const h = new Hydra({
+        client: {id: expectedId},
+        auth: {tokenHost: expectedUrl}
+      })
+      expect(h.config).toEqual({
+        client: {
+          id: expectedId,
+          secret: defaults.client.secret
+        },
+        auth: {
+          tokenHost: expectedUrl,
+          authorizePath: defaults.auth.authorizePath,
+          tokenPath: defaults.auth.tokenPath
+        }
+      })
+      expect(h.endpoint).toEqual(expectedUrl)
+      expect(h.scope).toEqual(defaults.scope)
     })
 
     // set up oauth2 endpoint
@@ -49,6 +97,29 @@ describe('services', () => {
       const h = new Hydra(config)
       return h.getKey('foo', 'bar').then((got) => {
         expect(got).toEqual(key['keys'][0])
+      })
+    })
+
+    test('getClient() should fetch a client from the backend', () => {
+      const client = {
+        dummy: true
+      }
+      nock('http://foo.localhost').get('/clients/foo').reply(200, client)
+
+      const h = new Hydra(Object.assign({scope: 'hydra.clients'}, config))
+      return h.getClient('foo').then((got) => {
+        expect(got).toEqual(client)
+      })
+    })
+
+    test('validateToken() token introspection', () => {
+      nock('http://foo.localhost').post('/oauth2/introspect', 'token=foo').reply(200, {
+        active: true
+      })
+
+      const h = new Hydra(Object.assign({scope: 'hydra.clients'}, config))
+      return h.validateToken('foo').then((got) => {
+        expect(got.active).toEqual(true)
       })
     })
 

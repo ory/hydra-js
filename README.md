@@ -42,7 +42,10 @@ const config = {
  },
  auth: {
    tokenHost: process.env.HYDRA_URL, // hydra url, defaults to this env var
- }
+   authorizePath: '/oauth2/auth', // hydra authorization endpoint, defaults to '/oauth2/auth'
+   tokenPath: '/oauth2/token', // hydra token endpoint, defaults to '/oauth2/token'
+ },
+ scope: 'hydra.keys.get' // scope of the authorization, defaults to 'hydra.keys.get'
 }
 
 const hydra = new Hydra(config)

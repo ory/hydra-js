@@ -7,19 +7,32 @@ const jwkToPem = require('jwk-to-pem')
 require('superagent-auth-bearer')(request)
 
 class Hydra {
-  constructor(config) {
-    this.config = Object.assign({
+  constructor(config = {}) {
+    let {
       client: {
-        id: process.env.HYDRA_CLIENT_ID,
-        secret: process.env.HYDRA_CLIENT_SECRET,
+        id: clientId = process.env.HYDRA_CLIENT_ID,
+        secret: clientSecret = process.env.HYDRA_CLIENT_SECRET
+      } = {},
+      auth: {
+        tokenHost: endpoint = process.env.HYDRA_URL,
+        authorizePath: authorizePath = '/oauth2/auth',
+        tokenPath: tokenPath = '/oauth2/token'
+      } = {},
+      scope: scope = 'hydra.keys.get'} = config
+
+    this.config = {
+      client: {
+        id: clientId,
+        secret: clientSecret
       },
       auth: {
-        tokenHost: process.env.HYDRA_URL,
-        authorizePath: '/oauth2/auth',
-        tokenPath: '/oauth2/token'
-      }
-    }, config)
-    this.endpoint = this.config.auth.tokenHost
+        tokenHost: endpoint,
+        authorizePath: authorizePath,
+        tokenPath: tokenPath
+      },
+    }
+    this.scope = scope
+    this.endpoint = endpoint
     this.token = null
   }
 
@@ -30,7 +43,7 @@ class Hydra {
       }
 
       this.oauth2 = OAuth2.create(this.config)
-      this.oauth2.clientCredentials.getToken({ scope: 'hydra.keys.get' }, (error, result) => {
+      this.oauth2.clientCredentials.getToken({ scope: this.scope }, (error, result) => {
         if (error) {
           return reject({ message: 'Could not retrieve access token: ' + error.message })
         }
@@ -84,6 +97,34 @@ class Hydra {
             }
             resolve({ consent: token })
           })
+        })
+      })
+    })
+  }
+
+  getClient(id) {
+    return new Promise((resolve, reject) => {
+      return this.authenticate().then(() => {
+        request.get(`${this.endpoint}/clients/${id}`).authBearer(this.token.token.access_token).end((err, res) => {
+          if (err || !res.ok) {
+            reject({ error: 'Could not retrieve client: ' + err && err.message })
+            return
+          }
+          resolve(res.body)
+        })
+      })
+    })
+  }
+
+  validateToken(token) {
+    return new Promise((resolve, reject) => {
+      return this.authenticate().then(() => {
+        request.post(`${this.endpoint}/oauth2/introspect`).send(`token=${token}`).authBearer(this.token.token.access_token).end((err, res) => {
+          if (err || !res.ok) {
+            reject({ error: 'Intospection failed: ' + err && err.message })
+            return
+          }
+          resolve(res.body)
         })
       })
     })
