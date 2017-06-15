@@ -21,7 +21,7 @@
   "devDependencies": {
     "eslint": "^3.8.1",
     "eslint-config-ory-am": "^3.0.0",
-    "jest": "^16.0.2",
+    "jest": "^20.0.4",
     "jwt-decode": "^2.1.0",
     "nock": "^8.1.0"
   },

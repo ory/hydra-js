@@ -59,12 +59,12 @@ class Hydra {
       return this.authenticate().then(() => {
         request.get(`${this.endpoint}/keys/${set}/${kid}`).authBearer(this.token.token.access_token).end((err, res) => {
           if (err || !res.ok) {
-            reject({ error: 'Could not retrieve validation key: ' + err.message })
+            reject({ error: 'Could not retrieve validation key: ' + err })
             return
           }
           resolve(res.body.keys[0])
         })
-      })
+      }, reject)
     })
   }
 
@@ -78,7 +78,7 @@ class Hydra {
           }
            resolve({ challenge: decoded })
         })
-      })
+      }, reject)
     })
   }
 
@@ -97,8 +97,8 @@ class Hydra {
             }
             resolve({ consent: token })
           })
-        })
-      })
+        }, reject)
+      }, reject)
     })
   }
 
@@ -107,12 +107,12 @@ class Hydra {
       return this.authenticate().then(() => {
         request.get(`${this.endpoint}/clients/${id}`).authBearer(this.token.token.access_token).end((err, res) => {
           if (err || !res.ok) {
-            reject({ error: 'Could not retrieve client: ' + err && err.message })
+            reject({ error: 'Could not retrieve client: ' + err })
             return
           }
           resolve(res.body)
         })
-      })
+      }, reject)
     })
   }
 
@@ -121,12 +121,12 @@ class Hydra {
       return this.authenticate().then(() => {
         request.post(`${this.endpoint}/oauth2/introspect`).send(`token=${token}`).authBearer(this.token.token.access_token).end((err, res) => {
           if (err || !res.ok) {
-            reject({ error: 'Intospection failed: ' + err && err.message })
+            reject({ error: 'Intospection failed: ' + err })
             return
           }
           resolve(res.body)
         })
-      })
+      }, reject)
     })
   }
 }

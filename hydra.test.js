@@ -35,6 +35,32 @@ describe('services', () => {
       scope: 'foo'
     }
 
+    const badHydra = new Hydra({
+      auth: { tokenHost: undefined },
+      client: { id: undefined, secret: undefined },
+      scope: undefined
+    });
+
+    test('simple-oauth2 errors should cause validateToken to reject()', () => {
+      return expect(badHydra.validateToken('foo')).rejects.toBeDefined()
+    })
+
+    test('simple-oauth2 errors should cause getClient to reject()', () => {
+      return expect(badHydra.getClient('foo')).rejects.toBeDefined()
+    })
+
+    test('simple-oauth2 errors should cause getKey to reject()', () => {
+      return expect(badHydra.getKey('foo', 'bar')).rejects.toBeDefined()
+    })
+
+    test('simple-oauth2 errors should cause verifyConsentChallenge to reject()', () => {
+      return expect(badHydra.verifyConsentChallenge('foo')).rejects.toBeDefined()
+    })
+
+    test('simple-oauth2 errors should cause generateConsentResponse to reject()', () => {
+      return expect(badHydra.generateConsentResponse('foo', 'bar', 'baz')).rejects.toBeDefined()
+    })
+
     test('constructor should override default values', () => {
       const h = new Hydra(config)
       expect(h.config).toEqual({client: config.client, auth: config.auth})
