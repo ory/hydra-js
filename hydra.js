@@ -18,7 +18,11 @@ class Hydra {
         authorizePath: authorizePath = '/oauth2/auth',
         tokenPath: tokenPath = '/oauth2/token'
       } = {},
-      scope: scope = 'hydra.keys.get'
+      scope: scope = 'hydra.keys.get',
+      options: {
+        useBodyAuth: useBodyAuth = false,
+        useBasicAuthorizationHeader: useBasicAuthorizationHeader = true
+      } = {}
     } = config
 
     this.config = {
@@ -31,7 +35,12 @@ class Hydra {
         authorizePath: authorizePath,
         tokenPath: tokenPath
       },
+      options: {
+        useBodyAuth,
+        useBasicAuthorizationHeader
+      }
     }
+
     this.scope = scope
     this.endpoint = endpoint
     this.token = null

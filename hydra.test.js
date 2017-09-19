@@ -19,7 +19,11 @@ describe('services', () => {
         authorizePath: '/oauth2/auth',
         tokenPath: '/oauth2/token'
       },
-      scope: 'hydra.keys.get'
+      scope: 'hydra.keys.get',
+      options: {
+        useBodyAuth: false,
+        useBasicAuthorizationHeader: true
+      }
     }
 
     const config = {
@@ -32,7 +36,11 @@ describe('services', () => {
         authorizePath: '/oauth2/auth',
         tokenPath: '/oauth2/token'
       },
-      scope: 'foo'
+      scope: 'foo',
+      options: {
+        useBodyAuth: false,
+        useBasicAuthorizationHeader: true
+      }
     }
 
     const badHydra = new Hydra({
@@ -73,14 +81,14 @@ describe('services', () => {
 
     test('constructor should override default values', () => {
       const h = new Hydra(config)
-      expect(h.config).toEqual({ client: config.client, auth: config.auth })
+      expect(h.config).toEqual({ client: config.client, auth: config.auth, options: config.options })
       expect(h.endpoint).toEqual(config.auth.tokenHost)
       expect(h.scope).toEqual(config.scope)
     })
 
     test('constructor should keep default values', () => {
       const h = new Hydra()
-      expect(h.config).toEqual({ client: defaults.client, auth: defaults.auth })
+      expect(h.config).toEqual({ client: defaults.client, auth: defaults.auth, options: config.options })
       expect(h.endpoint).toEqual(defaults.auth.tokenHost)
       expect(h.scope).toEqual(defaults.scope)
     })
@@ -102,6 +110,10 @@ describe('services', () => {
           tokenHost: expectedUrl,
           authorizePath: defaults.auth.authorizePath,
           tokenPath: defaults.auth.tokenPath
+        },
+        options: {
+          useBodyAuth: false,
+          useBasicAuthorizationHeader: true
         }
       })
       expect(h.endpoint).toEqual(expectedUrl)
