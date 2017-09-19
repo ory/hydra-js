@@ -62,8 +62,8 @@ class Hydra {
   }
 
   verifyConsentChallenge(challenge = '') {
-    return new Promise((resolve, reject) => {
-      return this.getKey('hydra.consent.challenge', 'public').then((key) => {
+    return this.getKey('hydra.consent.challenge', 'public').then((key) => {
+      return new Promise((resolve, reject) => {
         jwt.verify(challenge, jwkToPem(key), (error, decoded) => {
           if (error) {
             reject({ error, message: 'Could not verify consent challenge.' })
@@ -71,14 +71,14 @@ class Hydra {
           }
           resolve({ challenge: decoded })
         })
-      }, reject)
+      })
     })
   }
 
   generateConsentResponse(challenge, subject, scopes, at = {}, idt = {}) {
-    return new Promise((resolve, reject) => {
-      return this.verifyConsentChallenge(challenge).then(({ challenge }) => {
-        return this.getKey('hydra.consent.response', 'private').then((key) => {
+    return this.verifyConsentChallenge(challenge).then(({ challenge }) => {
+      return this.getKey('hydra.consent.response', 'private').then((key) => {
+        return new Promise((resolve, reject) => {
           const { aud, exp, jti } = challenge
           jwt.sign({
             jti,
@@ -98,8 +98,8 @@ class Hydra {
             }
             resolve({ consent: token })
           })
-        }, reject)
-      }, reject)
+        })
+      })
     })
   }
 
