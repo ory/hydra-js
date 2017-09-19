@@ -18,7 +18,8 @@ class Hydra {
         authorizePath: authorizePath = '/oauth2/auth',
         tokenPath: tokenPath = '/oauth2/token'
       } = {},
-      scope: scope = 'hydra.keys.get'} = config
+      scope: scope = 'hydra.keys.get'
+    } = config
 
     this.config = {
       client: {
@@ -37,35 +38,27 @@ class Hydra {
   }
 
   authenticate() {
-    return new Promise((resolve, reject) => {
-      if (this.token !== null && !this.token.expired()) {
-        return resolve(this.token)
-      }
+    if (this.token !== null && !this.token.expired()) {
+      return Promise.resolve(this.token)
+    }
 
-      this.oauth2 = OAuth2.create(this.config)
-      this.oauth2.clientCredentials.getToken({ scope: this.scope }, (error, result) => {
-        if (error) {
-          return reject({ message: 'Could not retrieve access token: ' + error.message })
-        }
-
-        this.token = this.oauth2.accessToken.create(result)
-        return resolve(this.token)
-      })
+    this.oauth2 = OAuth2.create(this.config)
+    return this.oauth2.clientCredentials.getToken({ scope: this.scope }).then((result) => {
+      this.token = this.oauth2.accessToken.create(result)
+      return Promise.resolve(this.token)
     })
   }
 
+
   getKey(set, kid) {
-    return new Promise((resolve, reject) => {
-      return this.authenticate().then(() => {
-        request.get(`${this.endpoint}/keys/${set}/${kid}`).authBearer(this.token.token.access_token).end((err, res) => {
-          if (err || !res.ok) {
-            reject({ error: 'Could not retrieve validation key: ' + err })
-            return
-          }
-          resolve(res.body.keys[0])
-        })
-      }, reject)
-    })
+    return this.authenticate().then(() => request
+      .get(`${this.endpoint}/keys/${set}/${kid}`)
+      .authBearer(this.token.token.access_token)
+      .then((res) => !res.ok
+        ? Promise.reject({ error: new Error('Status code is not 2xx'), message: 'Could not retrieve validation key.' })
+        : Promise.resolve(res.body.keys[0])
+      )
+    )
   }
 
   verifyConsentChallenge(challenge = '') {
@@ -73,10 +66,10 @@ class Hydra {
       return this.getKey('hydra.consent.challenge', 'public').then((key) => {
         jwt.verify(challenge, jwkToPem(key), (error, decoded) => {
           if (error) {
-            reject({ error: 'Could not verify consent challenge: ' + error })
+            reject({ error, message: 'Could not verify consent challenge.' })
             return
           }
-           resolve({ challenge: decoded })
+          resolve({ challenge: decoded })
         })
       }, reject)
     })
@@ -84,15 +77,23 @@ class Hydra {
 
   generateConsentResponse(challenge, subject, scopes, at = {}, idt = {}) {
     return new Promise((resolve, reject) => {
-      return this.verifyConsentChallenge(challenge).then(({challenge}) => {
+      return this.verifyConsentChallenge(challenge).then(({ challenge }) => {
         return this.getKey('hydra.consent.response', 'private').then((key) => {
           const { aud, exp, jti } = challenge
-          jwt.sign({ jti, aud, exp, scp: scopes, sub: subject, at_ext: at, id_ext: idt }, jwkToPem(Object.assign({}, key, {
+          jwt.sign({
+            jti,
+            aud,
+            exp,
+            scp: scopes,
+            sub: subject,
+            at_ext: at,
+            id_ext: idt
+          }, jwkToPem(Object.assign({}, key, {
             // the following keys are optional in the spec but for some reason required by the library.
             dp: '', dq: '', qi: ''
           }), { private: true }), { algorithm: 'RS256' }, (error, token) => {
             if (error) {
-              reject({ error: 'Could not verify consent challenge: ' + error })
+              reject({ error, message: 'Could not verify consent challenge.' })
               return
             }
             resolve({ consent: token })
@@ -103,31 +104,26 @@ class Hydra {
   }
 
   getClient(id) {
-    return new Promise((resolve, reject) => {
-      return this.authenticate().then(() => {
-        request.get(`${this.endpoint}/clients/${id}`).authBearer(this.token.token.access_token).end((err, res) => {
-          if (err || !res.ok) {
-            reject({ error: 'Could not retrieve client: ' + err })
-            return
-          }
-          resolve(res.body)
-        })
-      }, reject)
-    })
+    return this.authenticate().then(() => request
+      .get(`${this.endpoint}/clients/${id}`)
+      .authBearer(this.token.token.access_token)
+      .then((res) => !res.ok
+        ? Promise.reject({ error: new Error('Status code is not 2xx'), message: 'Could not retrieve client.' })
+        : Promise.resolve(res.body)
+      )
+    )
   }
 
   validateToken(token) {
-    return new Promise((resolve, reject) => {
-      return this.authenticate().then(() => {
-        request.post(`${this.endpoint}/oauth2/introspect`).send(`token=${token}`).authBearer(this.token.token.access_token).end((err, res) => {
-          if (err || !res.ok) {
-            reject({ error: 'Intospection failed: ' + err })
-            return
-          }
-          resolve(res.body)
-        })
-      }, reject)
-    })
+    return this.authenticate().then(() => request
+      .post(`${this.endpoint}/oauth2/introspect`)
+      .send(`token=${token}`)
+      .authBearer(this.token.token.access_token)
+      .then((res) => !res.ok
+        ? Promise.reject({ error: new Error('Status code is not 2xx'), message: 'Introspection failed.' })
+        : Promise.resolve(res.body)
+      )
+    )
   }
 }
 
