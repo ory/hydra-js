@@ -41,36 +41,46 @@ describe('services', () => {
       scope: undefined
     });
 
-    test('simple-oauth2 errors should cause validateToken to reject()', () => {
-      return expect(badHydra.validateToken('foo')).rejects.toBeDefined()
-    })
+    test('simple-oauth2 errors should cause validateToken to reject()', () =>
+      badHydra.validateToken('foo')
+        .then((err) => expect(false).toBeTruthy())
+        .catch((err) => expect(err).toBeDefined())
+    )
 
-    test('simple-oauth2 errors should cause getClient to reject()', () => {
-      return expect(badHydra.getClient('foo')).rejects.toBeDefined()
-    })
+    test('simple-oauth2 errors should cause getClient to reject()', () =>
+      badHydra.getClient('foo')
+        .then((err) => expect(false).toBeTruthy())
+        .catch((err) => expect(err).toBeDefined())
+    )
 
-    test('simple-oauth2 errors should cause getKey to reject()', () => {
-      return expect(badHydra.getKey('foo', 'bar')).rejects.toBeDefined()
-    })
+    test('simple-oauth2 errors should cause getKey to reject()', () =>
+      badHydra.getKey('foo', 'bar')
+        .then((err) => expect(false).toBeTruthy())
+        .catch((err) => expect(err).toBeDefined())
+    )
 
-    test('simple-oauth2 errors should cause verifyConsentChallenge to reject()', () => {
-      return expect(badHydra.verifyConsentChallenge('foo')).rejects.toBeDefined()
-    })
+    test('simple-oauth2 errors should cause verifyConsentChallenge to reject()', () =>
+      badHydra.verifyConsentChallenge('foo')
+        .then((err) => expect(false).toBeTruthy())
+        .catch((err) => expect(err).toBeDefined())
+    )
 
-    test('simple-oauth2 errors should cause generateConsentResponse to reject()', () => {
-      return expect(badHydra.generateConsentResponse('foo', 'bar', 'baz')).rejects.toBeDefined()
-    })
+    test('simple-oauth2 errors should cause generateConsentResponse to reject()', () =>
+      badHydra.generateConsentResponse('foo', 'bar', 'baz')
+        .then((err) => expect(false).toBeTruthy())
+        .catch((err) => expect(err).toBeDefined())
+    )
 
     test('constructor should override default values', () => {
       const h = new Hydra(config)
-      expect(h.config).toEqual({client: config.client, auth: config.auth})
+      expect(h.config).toEqual({ client: config.client, auth: config.auth })
       expect(h.endpoint).toEqual(config.auth.tokenHost)
       expect(h.scope).toEqual(config.scope)
     })
 
     test('constructor should keep default values', () => {
       const h = new Hydra()
-      expect(h.config).toEqual({client: defaults.client, auth: defaults.auth})
+      expect(h.config).toEqual({ client: defaults.client, auth: defaults.auth })
       expect(h.endpoint).toEqual(defaults.auth.tokenHost)
       expect(h.scope).toEqual(defaults.scope)
     })
@@ -80,8 +90,8 @@ describe('services', () => {
       const expectedId = 'foo'
 
       const h = new Hydra({
-        client: {id: expectedId},
-        auth: {tokenHost: expectedUrl}
+        client: { id: expectedId },
+        auth: { tokenHost: expectedUrl }
       })
       expect(h.config).toEqual({
         client: {
@@ -132,7 +142,7 @@ describe('services', () => {
       }
       nock('http://foo.localhost').get('/clients/foo').reply(200, client)
 
-      const h = new Hydra(Object.assign({scope: 'hydra.clients'}, config))
+      const h = new Hydra(Object.assign({ scope: 'hydra.clients' }, config))
       return h.getClient('foo').then((got) => {
         expect(got).toEqual(client)
       })
@@ -143,13 +153,16 @@ describe('services', () => {
         active: true
       })
 
-      const h = new Hydra(Object.assign({scope: 'hydra.clients'}, config))
+      const h = new Hydra(Object.assign({ scope: 'hydra.clients' }, config))
       return h.validateToken('foo').then((got) => {
         expect(got.active).toEqual(true)
       })
     })
 
-    test('consent challenge verification and consent response signing should work when a valid key is provided', () => new Promise((resolve, reject) => {
+    test('consent challenge verification and consent response signing should work when a valid key is provided', () => new Promise((
+      resolve,
+      reject
+    ) => {
       const keys = {
         "keys": [
           {
