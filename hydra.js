@@ -9,7 +9,7 @@ require('superagent-auth-bearer')(request)
 
 class Hydra {
   constructor(config = {}) {
-    let {
+    const {
       client: {
         id: clientId = process.env.HYDRA_CLIENT_ID,
         secret: clientSecret = process.env.HYDRA_CLIENT_SECRET
@@ -33,8 +33,8 @@ class Hydra {
       },
       auth: {
         tokenHost: endpoint,
-        authorizePath: authorizePath,
-        tokenPath: tokenPath
+        authorizePath,
+        tokenPath
       },
       options: {
         useBodyAuth,
