@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const OAuth2 = require('simple-oauth2')
 const request = require('superagent')
 const jwkToPem = require('jwk-to-pem')
-const url = require('url')
+const urlj = require('url-join')
 
 require('superagent-auth-bearer')(request)
 
@@ -62,7 +62,7 @@ class Hydra {
 
   getKey(set, kid) {
     return this.authenticate().then(() => request
-      .get(url.resolve(this.endpoint,`/keys/${set}/${kid}`))
+      .get(urlj(this.endpoint,`/keys/${set}/${kid}`))
       .authBearer(this.token.token.access_token)
       .then((res) => !res.ok
         ? Promise.reject({ error: new Error('Status code is not 2xx'), message: 'Could not retrieve validation key.' })
@@ -115,7 +115,7 @@ class Hydra {
 
   getClient(id) {
     return this.authenticate().then(() => request
-      .get(url.resolve(this.endpoint,`/clients/${id}`))
+      .get(urlj(this.endpoint,`/clients/${id}`))
       .authBearer(this.token.token.access_token)
       .then((res) => !res.ok
         ? Promise.reject({ error: new Error('Status code is not 2xx'), message: 'Could not retrieve client.' })
@@ -126,7 +126,7 @@ class Hydra {
 
   validateToken(token) {
     return this.authenticate().then(() => request
-      .post(url.resolve(this.endpoint,`/oauth2/introspect`))
+      .post(urlj(this.endpoint,`/oauth2/introspect`))
       .send(`token=${token}`)
       .authBearer(this.token.token.access_token)
       .then((res) => !res.ok
