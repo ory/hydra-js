@@ -7,6 +7,12 @@
 
 [Hydra](https://github.com/ory/hydra) is a runnable server implementation of the OAuth2 2.0 authorization framework and the OpenID Connect Core 1.0.
 
+## Deprecated with 0.10.0
+
+This library is deprecated starting with version 0.10.0 of Hydra. Instead, a code generated (based on swagger) SDK is available in the main repository: https://ory.gitbooks.io/hydra/content/sdk/go.html
+
+## Overview
+
 Hydra-js is a client library for javascript. It is currently available as an npm-module only. At this moment, Hydra-js
 primarily helps you with performing the consent validation.
 We welcome contributions that implement more of the Hydra HTTP REST API.
