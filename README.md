@@ -9,7 +9,7 @@
 
 ## Deprecated with 0.10.0
 
-This library is deprecated starting with version 0.10.0 of Hydra. Instead, a code generated (based on swagger) SDK is available in the main repository: https://ory.gitbooks.io/hydra/content/sdk/go.html
+This library is deprecated starting with version 0.10.0 of Hydra. Instead, a code generated (based on swagger) SDK is available in the main repository: https://ory.gitbooks.io/hydra/content/sdk/js.html
 
 ## Overview
 
